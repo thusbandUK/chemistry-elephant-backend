@@ -23,22 +23,20 @@ passport.use(new GoogleStrategy({
   callbackURL: '/oauth2/redirect/google',
   scope: [ 'profile' ]
 }, function verify(issuer, profile, cb) {
-  db.get('SELECT * FROM federated_credentials WHERE provider = ? AND subject = ?', [
+  pool.query('SELECT * FROM federated_credentials WHERE provider = $1 AND subject = $2', [
     issuer,
     profile.id
   ], function(err, row) {
     if (err) { return cb(err); }
-    if (row) {
-      console.log(row);
-    }
-    if (!row) {
-      db.run('INSERT INTO users (name) VALUES (?)', [
+    
+    if (!row.rows[0]) {
+      pool.query('INSERT INTO users (name) VALUES ($1) RETURNING *', [
         profile.displayName
-      ], function(err) {
+      ], function(err, results) {
         if (err) { return cb(err); }
+        var id = results.rows[0].id
         
-        var id = this.lastID;
-        db.run('INSERT INTO federated_credentials (user_id, provider, subject) VALUES (?, ?, ?)', [
+        pool.query('INSERT INTO federated_credentials (user_id, provider, subject) VALUES ($1, $2, $3) RETURNING *', [
           id,
           issuer,
           profile.id
@@ -52,11 +50,12 @@ passport.use(new GoogleStrategy({
         });
       });
     } else {
-      db.get('SELECT * FROM users WHERE id = ?', [ row.user_id ], function(err, row) {
+      
+      pool.query('SELECT * FROM users WHERE id = $1', [ row.rows[0].user_id ], function(err, row) {
         if (err) { return cb(err); }
-        if (!row) { return cb(null, false); }
-        console.log(row);
-        return cb(null, row);
+        if (!row.rows[0]) { return cb(null, false); }
+        
+        return cb(null, row.rows[0]);
       });
     }
   });
