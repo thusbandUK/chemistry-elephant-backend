@@ -50,9 +50,7 @@ app.use(passport.authenticate('session'));
 
 app.use('/', indexRouter);
 
-console.log('just before auth.js router call');
 app.use('/', authRouter);
-console.log('just after auth.js router call');
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -68,6 +66,10 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+var listener = app.listen(8888, function(){
+  console.log('Listening on port ' + listener.address().port); //Listening on port 8888
 });
 
 module.exports = app;

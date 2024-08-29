@@ -3,5 +3,5 @@ table
   
 3) import the details by which to access the postgresql database
 4) change the calls to sqlite to postgresql for the google login
-  --you need to install the postgres thingyhotsp
+  --need to register a new google app
 5) next change the database calls for the session details

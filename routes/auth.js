@@ -76,8 +76,6 @@ passport.deserializeUser(function(user, cb) {
   });
 });
 
-console.log('did the auth.js router get called?');
-
 router.get('/login', function(req, res, next) {
   res.render('login');
 });
