@@ -1,7 +1,3 @@
-2) familiarise self with postgresql login (from cmdlet), you'll need to make a new database and a new
-table
-  
-3) import the details by which to access the postgresql database
-4) change the calls to sqlite to postgresql for the google login
-  --need to register a new google app
-5) next change the database calls for the session details
+1) next change the database calls for the session details
+    --need to create a session table
+    --update code for pg instead of sqlite3

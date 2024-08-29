@@ -11,7 +11,7 @@ var logger = require('morgan');
 var logger = require('morgan');
 var session = require('express-session');
 
-var session = require('express-session');
+//var session = require('express-session');
 var passport = require('passport');
 
 var SQLiteStore = require('connect-sqlite3')(session);
@@ -19,6 +19,20 @@ var SQLiteStore = require('connect-sqlite3')(session);
 var indexRouter = require('./routes/index');
 
 var app = express();
+
+//imports for node-postgres
+const pg = require('pg');
+//const dotenv = require('dotenv').config();
+
+/*accesses database login details from .env file via dbConfig.js to establish new client pool*/
+const pgSession = require('connect-pg-simple')(session);
+var dbAccess = require('./dbConfig');
+
+const Pool = require('pg').Pool
+const pgPool = new Pool(dbAccess);
+//imports for node-postgres ends
+
+
 
 app.locals.pluralize = require('pluralize');
 
@@ -33,19 +47,30 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+/*
 app.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: false,
   store: new SQLiteStore({ db: 'sessions.db', dir: './var/db' })
+}));
+*/
+app.use(session({
+  store: new pgSession ({
+    // connect-pg-simple options:
+    pool : pgPool,
+    tableName : "session"
+  }),
+  secret: 'keyboard cat',
+  //httpOnly: false,
+  saveUninitialized: true,
+  //secret: process.env.FOO_COOKIE_SECRET,
+  resave: false,
+  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
+  // Insert express-session options here
 }));
 
-app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: false,
-  store: new SQLiteStore({ db: 'sessions.db', dir: './var/db' })
-}));
 app.use(passport.authenticate('session'));
 
 app.use('/', indexRouter);

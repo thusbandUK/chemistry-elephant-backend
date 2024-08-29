@@ -1,4 +1,4 @@
-var express = require('express');
+//var express = require('express');
 var express = require('express');
 var passport = require('passport');
 var GoogleStrategy = require('passport-google-oidc');
@@ -64,6 +64,8 @@ passport.use(new GoogleStrategy({
 
 
 passport.serializeUser(function(user, cb) {
+  console.log('serializeUser called with user details:')
+  console.log(user);
   process.nextTick(function() {
     cb(null, { id: user.id, username: user.username, name: user.name });
   });
