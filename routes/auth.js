@@ -2,8 +2,15 @@ var express = require('express');
 var express = require('express');
 var passport = require('passport');
 var GoogleStrategy = require('passport-google-oidc');
+//this is the new one for postgresql
+var dbAccess = require('../dbConfig');
+//this is the one that came with the tutorial
 var db = require('../db');
 var router = express.Router();
+
+var dbAccess = require('../dbConfig');
+const Pool = require('pg').Pool
+const pool = new Pool(dbAccess);
 
 /*
 Okay, that's interesting, even though you're validating via google, you still need to call the db. But as in, you're
@@ -21,6 +28,9 @@ passport.use(new GoogleStrategy({
     profile.id
   ], function(err, row) {
     if (err) { return cb(err); }
+    if (row) {
+      console.log(row);
+    }
     if (!row) {
       db.run('INSERT INTO users (name) VALUES (?)', [
         profile.displayName
@@ -45,6 +55,7 @@ passport.use(new GoogleStrategy({
       db.get('SELECT * FROM users WHERE id = ?', [ row.user_id ], function(err, row) {
         if (err) { return cb(err); }
         if (!row) { return cb(null, false); }
+        console.log(row);
         return cb(null, row);
       });
     }

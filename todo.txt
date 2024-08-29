@@ -1,6 +1,7 @@
-1) clone the tutorial
 2) familiarise self with postgresql login (from cmdlet), you'll need to make a new database and a new
 table
+  
 3) import the details by which to access the postgresql database
 4) change the calls to sqlite to postgresql for the google login
+  --you need to install the postgres thingyhotsp
 5) next change the database calls for the session details
